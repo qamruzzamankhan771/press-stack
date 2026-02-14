@@ -59,11 +59,22 @@ export default function LandingPage() {
             <span className="text-lg font-heading font-black tracking-tight leading-none">PRESS STACK</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary transition-colors">Features</a>
-            <a href="#pricing" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary transition-colors">Pricing</a>
-            <Link href="/compiler" className="btn-primary !py-2 !px-5 !text-xs !rounded-xl">
-              Launch Studio
-            </Link>
+            {['Features', 'Waitlist'].map(item => (
+              <motion.a
+                key={item}
+                href={item === 'Features' ? '#features' : '#early-access'}
+                whileHover={{ y: -1 }}
+                whileTap={{ y: 0 }}
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-primary transition-colors cursor-pointer"
+              >
+                {item}
+              </motion.a>
+            ))}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/compiler" className="btn-primary !py-2.5 !px-6 !text-[10px] !rounded-xl shadow-lg shadow-primary/20">
+                Launch Studio
+              </Link>
+            </motion.div>
           </div>
         </div>
       </nav>
@@ -89,13 +100,18 @@ export default function LandingPage() {
             </p>
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#early-access" className="btn-primary !text-sm group !px-10">
+                <motion.a
+                  href="#early-access"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-primary btn-shine btn-glow !text-sm group !px-12 !py-5 shadow-2xl shadow-primary/40"
+                >
                   Join Early Access
-                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-                </a>
+                  <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                </motion.a>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 italic">
-                Be one of the first 50 developers to get lifetime early access.
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 italic px-2">
+                Join 1,200+ developers waiting for launch.
               </p>
             </div>
           </motion.div>
@@ -230,10 +246,15 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div {...fadeIn}>
-            <a href="#early-access" className="btn-primary !text-sm group !px-10">
+            <motion.a
+              href="#early-access"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-primary btn-glow !text-sm group !px-12"
+            >
               Get Early Access
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </a>
+            </motion.a>
           </motion.div>
         </div>
       </section>
@@ -273,10 +294,15 @@ export default function LandingPage() {
           </div>
 
           <motion.div {...fadeIn} className="text-center">
-            <a href="#early-access" className="btn-primary !text-sm group !px-10">
+            <motion.a
+              href="#early-access"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-primary !text-sm group !px-12 bg-white !text-primary hover:bg-white/90"
+            >
               Reserve Your Spot
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </a>
+            </motion.a>
           </motion.div>
         </div>
       </section>
@@ -360,22 +386,27 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="max-w-lg mx-auto"
           >
-            <div className="bg-white p-2 rounded-3xl shadow-xl border border-border flex flex-col sm:flex-row gap-2">
+            <div className="bg-white p-3 rounded-[2rem] shadow-2xl border border-border flex flex-col sm:flex-row gap-3 transition-all hover:shadow-primary/5">
               <input
                 type="email"
                 placeholder="developer@agency.com"
-                className="flex-1 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 ring-primary/20 font-medium text-sm"
+                className="flex-1 px-8 py-4 rounded-[1.5rem] focus:outline-none focus:ring-4 ring-primary/5 font-medium text-sm bg-gray-50/50 border border-transparent focus:border-primary/10 transition-all"
               />
-              <button className="btn-primary !rounded-2xl !py-4 !px-8 !text-sm whitespace-nowrap">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn-primary btn-glow !rounded-[1.5rem] !py-4 !px-10 !text-[11px] whitespace-nowrap shadow-primary/20"
+              >
                 Join Now
-              </button>
+              </motion.button>
             </div>
-            <p className="mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              We respect your privacy. No spam.
+            <p className="mt-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+              We respect your privacy. No spam. Guaranteed.
             </p>
           </motion.div>
         </div>
       </section>
+
 
       {/* 7. Social Proof */}
       <section className="py-32 px-6">
@@ -446,10 +477,17 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <Github size={18} className="text-gray-400 hover:text-primary cursor-pointer transition-colors" />
+            <motion.a
+              href="https://github.com/qamruzzamankhan771/press-stack"
+              target="_blank"
+              whileHover={{ scale: 1.2, rotate: 5 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Github size={18} className="text-gray-400 hover:text-primary cursor-pointer transition-colors" />
+            </motion.a>
           </div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">
-            © 2026 DEEPMIND ADVANCED ARCHITECTURE PROJECT | v3.3.1 Stable
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] italic">
+            © 2026 PRESS STACK | v3.3.2 PRODUCTION STABLE
           </p>
         </div>
       </footer>

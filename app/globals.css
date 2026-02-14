@@ -34,11 +34,28 @@
   }
 
   .btn-primary {
-    @apply bg-primary text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-102 active:scale-98 shadow-md shadow-primary/10 hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply relative bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all duration-500 overflow-hidden shadow-xl shadow-primary/20 hover:shadow-primary/40 flex items-center justify-center gap-2 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-white border-2 border-border text-text px-6 py-3 rounded-2xl font-bold transition-all duration-300 hover:border-primary/30 active:scale-98 flex items-center justify-center gap-2 shadow-sm;
+    @apply bg-white/80 backdrop-blur-md border border-border text-text px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all duration-300 hover:bg-white hover:border-primary/20 hover:shadow-lg active:scale-98 flex items-center justify-center gap-2;
+  }
+
+  .btn-shine {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-shine::after {
+    content: '';
+    @apply absolute top-0 -left-full w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-all duration-1000 skew-x-[-25deg];
+  }
+
+  .btn-shine:hover::after {
+    @apply left-full;
+  }
+
+  .btn-glow:hover {
+    @apply shadow-[0_0_30px_-5px_var(--color-primary)];
   }
 
   .input-field {
