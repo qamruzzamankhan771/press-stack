@@ -79,22 +79,24 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
               <Sparkles size={12} className="text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary">MVP Early Access Open</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary">Limited: First 50 Developers</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-heading font-black tracking-tight leading-[1.1]">
               Stop Rebuilding <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">WordPress</span> from Scratch
             </h1>
             <p className="text-lg text-gray-500 max-w-xl font-medium leading-relaxed">
-              Build custom WordPress themes with structured content models, plugin stacks, and export-ready starter packages — in minutes.
+              Build fully custom WordPress themes with structured content models, plugin stacks, and export-ready starter packages — in minutes, not hours.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/compiler" className="btn-primary !text-sm group">
-                Start Free Export
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-              </Link>
-              <a href="#how-it-works" className="btn-secondary !text-sm">
-                How It Works
-              </a>
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="#early-access" className="btn-primary !text-sm group !px-10">
+                  Join Early Access
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </a>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 italic">
+                Be one of the first 50 developers to get lifetime early access.
+              </p>
             </div>
           </motion.div>
 
@@ -151,10 +153,10 @@ export default function LandingPage() {
             </h2>
             <ul className="space-y-6">
               {[
-                { title: 'Manual ACF Configuration', desc: 'Defining fields and field groups one by one is a soul-crushing chore.' },
-                { title: 'Inconsistent Semantic Code', desc: 'Rebuilding clean PHP scaffolds from scratch leads to inconsistency.' },
-                { title: 'Accessibility Overhead', desc: 'Manually ensuring every landmark and aria-label is correct takes focus away from design.' },
-                { title: 'Setup Fatigue', desc: 'Repeating the same core workflow for every client reduces your hourly rate.' }
+                { title: 'Configuring plugins & ACF', desc: 'Setting up fields manually for every new project is slow and error-prone.' },
+                { title: 'Rebuilding Theme Scaffolds', desc: 'Redoing the functions.php, folder structure, and templates from scratch.' },
+                { title: 'SEO & Accessibility Basics', desc: 'Repeating mandatory setup tasks instead of focusing on unique features.' },
+                { title: 'Repetitive Workflows', desc: 'Losing valuable hours to the exact same tasks across different clients.' }
               ].map((item, i) => (
                 <li key={i} className="flex gap-4">
                   <div className="w-6 h-6 rounded-full bg-red-100 flex-shrink-0 flex items-center justify-center mt-1">
@@ -181,7 +183,7 @@ export default function LandingPage() {
                 <Settings size={64} className="text-primary animate-spin-slow relative z-10" />
               </div>
               <p className="text-gray-400 font-mono text-xs text-center uppercase tracking-widest italic animate-pulse">
-                processing manual tasks...
+                automating repetitive setup...
               </p>
             </div>
           </motion.div>
@@ -193,10 +195,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto space-y-20 text-center">
           <motion.div {...fadeIn} className="max-w-3xl mx-auto space-y-4">
             <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
-              PressStack Automates Your Foundation
+              PressStack Automates Your WordPress Foundation
             </h2>
             <p className="text-gray-500 font-medium">
-              We handle the grunt work so you can focus on the premium architecture.
+              A developer-first tool to generate structured WordPress stacks ready to deploy.
             </p>
           </motion.div>
 
@@ -208,10 +210,10 @@ export default function LandingPage() {
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {[
-              { icon: Layers, title: 'Project Scaffold', desc: 'Generate clean theme structures, standardizing your team workflow.' },
-              { icon: Code2, title: 'ACF Builder', desc: 'Automatic creation of field groups and sub-fields from your HTML source.' },
-              { icon: Shield, title: 'Safe Export', desc: 'Production-ready code that follows WordPress best practices and security.' },
-              { icon: Zap, title: 'Instant Packages', desc: 'Download deployable ZIP files containing all templates and logic.' }
+              { icon: Layers, title: 'Clean PHP Scaffolds', desc: 'Generate high-quality theme structures for fully custom WordPress themes.' },
+              { icon: Code2, title: 'ACF Field Builder', desc: 'Automatic creation of custom post types and complex ACF field groups.' },
+              { icon: Shield, title: 'Plugin Stacks', desc: 'Preconfigure essential plugin stacks for SEO, Performance, and Commerce.' },
+              { icon: Zap, title: 'Starter Packages', desc: 'Export deployable WordPress starter packages ready for instant use.' }
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -226,6 +228,13 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </motion.div>
+
+          <motion.div {...fadeIn}>
+            <a href="#early-access" className="btn-primary !text-sm group !px-10">
+              Get Early Access
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </a>
+          </motion.div>
         </div>
       </section>
 
@@ -238,17 +247,15 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto relative z-10 space-y-20">
           <motion.div {...fadeIn} className="text-center space-y-4">
             <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
-              From Zero to Deployable in <span className="text-primary italic">4 Steps</span>
+              Get Started in <span className="text-primary italic">3 Steps</span>
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-4 relative">
-            <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 hidden md:block" />
+          <div className="grid md:grid-cols-3 gap-8 relative">
             {[
-              { num: '01', title: 'Import Source', desc: 'Paste your raw static HTML structure' },
-              { num: '02', title: 'Choose Stack', desc: 'Select presets for ACF and Theme logic' },
-              { num: '03', title: 'Define Models', desc: 'Refine field names and groupings' },
-              { num: '04', title: 'Export & Fly', desc: 'Download your ready-to-use theme zip' }
+              { num: '01', title: 'Sign up for access', desc: 'Join the waitlist — limited spots available for the MVP phase' },
+              { num: '02', title: 'Select your stack', desc: 'Choose presets for Core, Content, or Commerce (basic) logic' },
+              { num: '03', title: 'Export & Deploy', desc: 'Download and install your ready-to-use WordPress starter package' }
             ].map((step, i) => (
               <motion.div
                 key={i}
@@ -266,10 +273,10 @@ export default function LandingPage() {
           </div>
 
           <motion.div {...fadeIn} className="text-center">
-            <Link href="/compiler" className="btn-primary !text-sm group !px-10">
-              Start Your First Project
+            <a href="#early-access" className="btn-primary !text-sm group !px-10">
+              Reserve Your Spot
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -289,10 +296,10 @@ export default function LandingPage() {
 
             <div className="grid sm:grid-cols-2 gap-8">
               {[
-                { title: 'Save 2–5 Hours', desc: 'Per project, per developer. Reclaim your focus.' },
-                { title: 'Standardized Workflow', desc: 'Maintain codebase consistency across teams.' },
-                { title: 'Professional PHP', desc: 'PSR-compliant code that senior devs love.' },
-                { title: 'Reduced Setup Errors', desc: 'Automated field mapping prevents human error.' }
+                { title: 'Save 2–5 Hours', desc: 'Per project, reclaim your focus for unique features.' },
+                { title: 'Standardize Workflow', desc: 'Maintain codebase consistency across teams and clients.' },
+                { title: 'Professional PHP', desc: 'Clean, professional logic that senior devs actually like.' },
+                { title: 'Scale Efficiently', desc: 'Reduce technical debt and scale multiple projects faster.' }
               ].map((benefit, i) => (
                 <div key={i} className="space-y-2">
                   <div className="flex items-center gap-2">
@@ -314,7 +321,7 @@ export default function LandingPage() {
             <div className="absolute -inset-10 bg-primary/20 blur-3xl rounded-full" />
             <div className="relative section-card bg-white p-12 text-center space-y-6">
               <div className="text-7xl font-heading font-black text-primary leading-none">95%</div>
-              <div className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">Time Reduction in Prep</div>
+              <div className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">Setup Automation Score</div>
               <div className="pt-8 border-t border-border mt-4 flex justify-between gap-4">
                 <div className="flex-1 text-left">
                   <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Traditional</div>
@@ -334,67 +341,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. Pricing Section */}
-      <section id="pricing" className="py-32 bg-gray-50 border-y border-border px-6">
-        <div className="max-w-7xl mx-auto space-y-20">
-          <motion.div {...fadeIn} className="text-center space-y-4">
+      {/* 6. Early Access / Waitlist Section */}
+      <section id="early-access" className="py-32 bg-gray-50 border-y border-border px-6 overflow-hidden relative">
+        <div className="max-w-4xl mx-auto text-center space-y-12">
+          <motion.div {...fadeIn} className="space-y-4">
             <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight uppercase">
-              Get Early Access Today
+              Join the Developer Early Access List
             </h2>
-            <p className="text-gray-500 font-medium italic">Limited spots available for the Lifetime Studio license.</p>
+            <p className="text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
+              Be the first to try PressStack. Get lifetime early access and exclusive perks.
+              Limited spots available for our initial beta cohort.
+            </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-8 items-end">
-            {/* Free */}
-            <motion.div {...fadeIn} className="section-card p-10 bg-white">
-              <div className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Free Tier</div>
-              <div className="text-5xl font-heading font-black text-gray-900 mb-8">$0</div>
-              <ul className="space-y-4 mb-10">
-                {['1 Theme Export', 'Core WP Structure', 'Basic ACF Mapping', 'Community Docs'].map((f, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-500">
-                    <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/compiler" className="btn-secondary !w-full !text-sm">Start Free</Link>
-            </motion.div>
-
-            {/* Pro - Recommended */}
-            <motion.div
-              initial={{ opacity: 0, scale: 1.05, y: 20 }}
-              whileInView={{ opacity: 1, scale: 1.05, y: -20 }}
-              viewport={{ once: true }}
-              className="section-card p-12 bg-[#0c111d] border-primary/30 relative z-10 shadow-2xl"
-            >
-              <div className="absolute top-0 right-10 -translate-y-1/2 bg-primary px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white italic">Most Popular</div>
-              <div className="text-xs font-black uppercase tracking-widest text-primary/70 mb-6">Professional</div>
-              <div className="text-5xl font-heading font-black text-white mb-2">$19</div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8">per month</div>
-              <ul className="space-y-4 mb-10 text-gray-300">
-                {['Unlimited Exports', 'Full ACF Pro Integration', 'WooCommerce Layout Presets', 'Standardized Logic Engine', 'Priority Build Support'].map((f, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <button className="btn-primary !w-full !text-sm shadow-primary/20">Upgrade to Pro</button>
-            </motion.div>
-
-            {/* Lifetime */}
-            <motion.div {...fadeIn} className="section-card p-10 bg-white">
-              <div className="text-xs font-black uppercase tracking-widest text-secondary mb-6">Early Adopter</div>
-              <div className="text-5xl font-heading font-black text-gray-900 mb-2">$99</div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8">one-time payment</div>
-              <ul className="space-y-4 mb-10 text-gray-500">
-                {['Lifetime Pro Access', 'All Future Engine Updates', 'Private Slack Channel', 'Influencer Badge', 'Custom Core Preset Request'].map((f, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <CheckCircle2 size={16} className="text-secondary flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <button className="btn-secondary !w-full !text-sm border-secondary text-secondary hover:bg-secondary/5">Claim Lifetime Spot</button>
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-lg mx-auto"
+          >
+            <div className="bg-white p-2 rounded-3xl shadow-xl border border-border flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                placeholder="developer@agency.com"
+                className="flex-1 px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 ring-primary/20 font-medium text-sm"
+              />
+              <button className="btn-primary !rounded-2xl !py-4 !px-8 !text-sm whitespace-nowrap">
+                Join Now
+              </button>
+            </div>
+            <p className="mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              We respect your privacy. No spam.
+            </p>
+          </motion.div>
         </div>
       </section>
 
@@ -447,18 +426,18 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Engine</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Links</h4>
             <ul className="space-y-4">
-              {['Compiler', 'Formatters', 'Optimization', 'Scaffold'].map(item => (
+              {['Docs', 'FAQ', 'Contact Support', 'Privacy Policy'].map(item => (
                 <li key={item}><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors font-medium">{item}</a></li>
               ))}
             </ul>
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Resources</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Social</h4>
             <ul className="space-y-4">
-              {['Documentation', 'FAQ', 'Contact Support', 'Privacy Policy'].map(item => (
+              {['Twitter', 'LinkedIn', 'Github'].map(item => (
                 <li key={item}><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors font-medium">{item}</a></li>
               ))}
             </ul>
