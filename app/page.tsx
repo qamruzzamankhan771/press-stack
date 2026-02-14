@@ -139,7 +139,7 @@ export default function LandingPage() {
                   href="#early-access"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="btn-primary btn-shine btn-glow !text-base group !px-10 !py-4 shadow-2xl shadow-primary/40"
+                  className="btn-primary btn-shine btn-glow !text-base w-full text-center group !px-10 !py-4 shadow-2xl shadow-primary/40"
                 >
                   Join Early Access
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />

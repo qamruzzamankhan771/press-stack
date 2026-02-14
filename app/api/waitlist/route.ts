@@ -4,17 +4,17 @@ import { Resend } from 'resend';
 // Initialize Resend with the API key from environment variables
 export async function POST(req: Request) {
     try {
-        // Initialize Resend inside the handler to avoid build-time errors
-        const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
+        // Initialize Resend - No fallback to ensure clear error if env is missing
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const { email } = await req.json();
 
         if (!email) {
             return NextResponse.json({ error: 'Email is required' }, { status: 400 });
         }
 
-        // Send email notification to qamruzzamankhan96@gmail.com
+        // Send email notification - using verified from address from working snippet
         const { data, error } = await resend.emails.send({
-            from: 'PressStack Waitlist <onboarding@resend.dev>',
+            from: 'onboarding@resend.dev',
             to: ['qamruzzamankhan96@gmail.com'],
             subject: 'New Waitlist Signup: PressStack',
             html: `
