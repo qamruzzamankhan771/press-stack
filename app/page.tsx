@@ -24,12 +24,45 @@ import { useState, useEffect } from 'react';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus('success');
+        setEmail('');
+      } else {
+        setStatus('error');
+        setErrorMessage(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Waitlist Submission Error:', error);
+      setStatus('error');
+      setErrorMessage('Failed to connect to the server.');
+    }
+  };
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -250,53 +283,40 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div {...fadeIn}>
-            <motion.a
-              href="#early-access"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-primary btn-glow !text-[12px] group !px-8 !py-3.5"
-            >
-              Get Early Access
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-            </motion.a>
+            <div className="max-w-md mx-auto"> {/* Limit width and center */}
+              <motion.a
+                href="#early-access"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-primary btn-glow !text-[12px] group !px-8 !py-3.5 w-full text-center"
+              >
+                Get Early Access
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1 ml-2 inline-block" />
+              </motion.a>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 4. How It Works - Reference-based Stacked Scroll */}
-      <section id="how-it-works" className="py-32 bg-[#0a0a0a] text-white relative px-6">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
+      {/* 4. How It Works - Vertical Layout */}
+      <section id="how-it-works" className="py-32 bg-gray-900 text-white relative px-6">
+        <div className="max-w-7xl mx-auto space-y-20">
 
-          {/* Left Side: Sticky Content - Sticky for the duration of the right side scroll */}
-          <div className="lg:sticky lg:top-32 space-y-12 h-fit pb-20">
-            <motion.div {...fadeIn} className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/30">
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Process</span>
-              </div>
-              <h2 className="text-4xl md:text-7xl font-heading font-black tracking-tight leading-[0.9] text-white">
-                Get Started in <br />
-                <span className="text-primary italic">3 Steps</span>
-              </h2>
-              <p className="text-gray-400 text-lg font-medium max-w-md leading-relaxed">
-                Our automated pipeline handles the heavy lifting, giving you a production-ready WordPress foundation in seconds.
-              </p>
-            </motion.div>
+          {/* Header Content */}
+          <motion.div {...fadeIn} className="text-center space-y-6 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/30">
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Process</span>
+            </div>
+            <h2 className="text-4xl md:text-7xl font-heading font-black tracking-tight leading-none text-white">
+              Get Started in <span className="text-primary italic">3 Steps</span>
+            </h2>
+            <p className="text-gray-400 text-lg font-medium leading-relaxed">
+              Our automated pipeline handles the heavy lifting, giving you a production-ready WordPress foundation in seconds.
+            </p>
+          </motion.div>
 
-            <motion.div {...fadeIn}>
-              <motion.a
-                href="#early-access"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-primary btn-shine btn-glow !text-sm group !px-8 !py-4 shadow-2xl shadow-primary/40 !bg-white !text-primary"
-              >
-                Join Early Access
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-              </motion.a>
-            </motion.div>
-          </div>
-
-          {/* Right Side: Stacked Cards logic from reference */}
-          <div className="relative space-y-[40vh] lg:space-y-0 lg:h-[240vh]">
+          {/* Steps Grid */}
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               { num: '01', title: 'Sign up for access', desc: 'Join the waitlist — limited spots available for the MVP phase. We prioritize agencies and active contributors.', color: 'bg-primary' },
               { num: '02', title: 'Select your stack', desc: 'Choose presets for Core, Content, or Commerce logic. Define your ACF models and plugin requirements.', color: 'bg-secondary' },
@@ -304,30 +324,40 @@ export default function LandingPage() {
             ].map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: false, amount: 0.5 }}
-                className="lg:sticky lg:top-40 mb-20 lg:mb-0"
-                style={{ zIndex: i + 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden group hover:bg-white/10 transition-all duration-300"
               >
-                <div className="bg-[#111] border border-white/5 p-10 md:p-14 rounded-[3rem] shadow-2xl space-y-6 relative overflow-hidden min-h-[450px] flex flex-col justify-center transition-all duration-500 hover:border-primary/20">
-                  <div className={`absolute top-0 left-0 w-1.5 h-full ${step.color} opacity-40`} />
-                  <div className="text-7xl font-heading font-black text-white/5 absolute top-10 right-10 leading-none">
-                    {step.num}
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-4xl font-black tracking-tight uppercase leading-tight text-white">{step.title}</h3>
-                    <p className="text-xl text-gray-500 leading-relaxed font-medium">
-                      {step.desc}
-                    </p>
-                  </div>
-
-                  {/* Decorative background element */}
-                  <div className={`absolute -bottom-20 -right-20 w-64 h-64 ${step.color} opacity-[0.03] rounded-full blur-[100px]`} />
+                <div className={`absolute top-0 left-0 w-full h-1 ${step.color} opacity-40`} />
+                <div className="text-5xl font-heading font-black text-primary/20 leading-none">
+                  {step.num}
                 </div>
+                <div className="space-y-4">
+                  <h3 className="text-xl font-black tracking-tight uppercase text-white">{step.title}</h3>
+                  <p className="text-gray-400 leading-relaxed font-medium">
+                    {step.desc}
+                  </p>
+                </div>
+
+                {/* Decorative element */}
+                <div className={`absolute -bottom-10 -right-10 w-32 h-32 ${step.color} opacity-5 rounded-full blur-[80px]`} />
               </motion.div>
             ))}
           </div>
+
+          <motion.div {...fadeIn} className="text-center">
+            <motion.a
+              href="#early-access"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-primary btn-shine btn-glow !text-sm group !px-12 !py-5 shadow-2xl shadow-primary/40 !bg-white !text-primary mx-auto inline-flex items-center gap-2"
+            >
+              Join Early Access
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </motion.a>
+          </motion.div>
         </div>
       </section>
 
@@ -406,22 +436,61 @@ export default function LandingPage() {
 
           <motion.div
             {...fadeIn}
-            className="flex flex-col items-center gap-8"
+            className="flex flex-col items-center gap-8 w-full max-w-xl mx-auto"
           >
-            <div className="w-full max-w-xl p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center shadow-2xl">
-              <input
-                type="email"
-                placeholder="developer@agency.com"
-                className="flex-1 bg-transparent border-none focus:ring-0 px-6 text-white font-medium placeholder:text-gray-600"
-              />
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="btn-primary btn-glow !px-8 !py-3.5 !rounded-2xl !text-sm whitespace-nowrap"
+            {status === 'success' ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full p-8 bg-primary/10 border border-primary/20 rounded-[2rem] text-center space-y-4"
               >
-                Join Now
-              </motion.button>
-            </div>
+                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto text-primary">
+                  <CheckCircle2 size={24} />
+                </div>
+                <h3 className="text-2xl font-black text-white uppercase">You're on the list!</h3>
+                <p className="text-gray-400 font-medium">We'll notify you as soon as we're ready for launch.</p>
+                <button
+                  onClick={() => setStatus('idle')}
+                  className="text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors"
+                >
+                  Clear
+                </button>
+              </motion.div>
+            ) : (
+              <form
+                onSubmit={handleWaitlistSubmit}
+                className="w-full p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center shadow-2xl overflow-hidden focus-within:border-primary/40 transition-all"
+              >
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="developer@agency.com"
+                  required
+                  className="flex-1 bg-transparent border-none focus:ring-0 px-6 text-white font-medium placeholder:text-gray-600"
+                />
+                <motion.button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-primary btn-glow !px-8 !py-3.5 !rounded-2xl !text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                >
+                  {status === 'loading' ? 'Joining...' : 'Join Now'}
+                </motion.button>
+              </form>
+            )}
+
+            {status === 'error' && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-red-400 text-xs font-bold uppercase tracking-widest"
+              >
+                {errorMessage}
+              </motion.p>
+            )}
+
             <p className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 italic">
               We respect your privacy. No spam. Guaranteed.
             </p>
