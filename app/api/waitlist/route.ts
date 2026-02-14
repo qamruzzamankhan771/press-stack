@@ -5,17 +5,28 @@ import { Resend } from 'resend';
 export async function POST(req: Request) {
     try {
         // Initialize Resend - No fallback to ensure clear error if env is missing
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const apiKey = process.env.RESEND_API_KEY;
+        const targetEmail = process.env.EMAIL;
+
+        if (!apiKey || !targetEmail) {
+            console.error('Missing required environment variables:', {
+                apiKey: !!apiKey,
+                targetEmail: !!targetEmail
+            });
+            return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+        }
+
+        const resend = new Resend(apiKey);
         const { email } = await req.json();
 
         if (!email) {
             return NextResponse.json({ error: 'Email is required' }, { status: 400 });
         }
 
-        // Send email notification - using verified from address from working snippet
+        // Send email notification
         const { data, error } = await resend.emails.send({
             from: 'onboarding@resend.dev',
-            to: ['qamruzzamankhan96@gmail.com'],
+            to: [targetEmail],
             subject: 'New Waitlist Signup: PressStack',
             html: `
                 <div style="font-family: sans-serif; padding: 20px; color: #333;">
