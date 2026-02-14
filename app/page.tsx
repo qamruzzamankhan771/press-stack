@@ -65,13 +65,13 @@ export default function LandingPage() {
                 href={item === 'Features' ? '#features' : '#early-access'}
                 whileHover={{ y: -1 }}
                 whileTap={{ y: 0 }}
-                className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-primary transition-colors cursor-pointer"
+                className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-primary transition-colors cursor-pointer"
               >
                 {item}
               </motion.a>
             ))}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/compiler" className="btn-primary !py-2.5 !px-6 !text-[10px] !rounded-xl shadow-lg shadow-primary/20">
+              <Link href="/compiler" className="btn-primary !py-2.5 !px-6 !text-[12px] !rounded-xl shadow-lg shadow-primary/20">
                 Launch Studio
               </Link>
             </motion.div>
@@ -106,13 +106,13 @@ export default function LandingPage() {
                   href="#early-access"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="btn-primary btn-shine btn-glow !text-sm group !px-12 !py-5 shadow-2xl shadow-primary/40"
+                  className="btn-primary btn-shine btn-glow !text-base group !px-10 !py-4 shadow-2xl shadow-primary/40"
                 >
                   Join Early Access
-                  <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                  <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 </motion.a>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 italic px-2">
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/60 italic px-2">
                 Join 1,200+ developers waiting for launch.
               </p>
             </div>
@@ -254,7 +254,7 @@ export default function LandingPage() {
               href="#early-access"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-primary btn-glow !text-[10px] group !px-8 !py-3.5"
+              className="btn-primary btn-glow !text-[12px] group !px-8 !py-3.5"
             >
               Get Early Access
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -263,17 +263,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. How It Works - Stacked Scroll Layout */}
-      <section id="how-it-works" className="py-32 bg-gray-900 text-white overflow-visible relative px-6">
+      {/* 4. How It Works - Reference-based Stacked Scroll */}
+      <section id="how-it-works" className="py-32 bg-[#0a0a0a] text-white relative px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
 
-          {/* Left Side: Sticky Content */}
-          <div className="lg:sticky lg:top-40 space-y-12">
+          {/* Left Side: Sticky Content - Sticky for the duration of the right side scroll */}
+          <div className="lg:sticky lg:top-32 space-y-12 h-fit pb-20">
             <motion.div {...fadeIn} className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/30">
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Process</span>
               </div>
-              <h2 className="text-4xl md:text-7xl font-heading font-black tracking-tight leading-[0.9]">
+              <h2 className="text-4xl md:text-7xl font-heading font-black tracking-tight leading-[0.9] text-white">
                 Get Started in <br />
                 <span className="text-primary italic">3 Steps</span>
               </h2>
@@ -287,7 +287,7 @@ export default function LandingPage() {
                 href="#early-access"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn-primary btn-shine btn-glow !text-sm group !px-12 !py-5 shadow-2xl shadow-primary/40 !bg-white !text-primary"
+                className="btn-primary btn-shine btn-glow !text-sm group !px-8 !py-4 shadow-2xl shadow-primary/40 !bg-white !text-primary"
               >
                 Join Early Access
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
@@ -295,8 +295,8 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Right Side: Stacked Cards */}
-          <div className="space-y-40 pb-40">
+          {/* Right Side: Stacked Cards logic from reference */}
+          <div className="relative space-y-[40vh] lg:space-y-0 lg:h-[240vh]">
             {[
               { num: '01', title: 'Sign up for access', desc: 'Join the waitlist — limited spots available for the MVP phase. We prioritize agencies and active contributors.', color: 'bg-primary' },
               { num: '02', title: 'Select your stack', desc: 'Choose presets for Core, Content, or Commerce logic. Define your ACF models and plugin requirements.', color: 'bg-secondary' },
@@ -304,21 +304,26 @@ export default function LandingPage() {
             ].map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, margin: "-100px" }}
-                className="sticky top-40 group"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: false, amount: 0.5 }}
+                className="lg:sticky lg:top-40 mb-20 lg:mb-0"
+                style={{ zIndex: i + 1 }}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden h-[400px] flex flex-col justify-center transition-all duration-500 group-hover:bg-white/10">
-                  <div className={`absolute top-0 left-0 w-1 h-full ${step.color} opacity-50`} />
-                  <div className="text-6xl font-heading font-black text-primary/20">{step.num}</div>
-                  <h3 className="text-3xl font-black tracking-tight uppercase leading-none">{step.title}</h3>
-                  <p className="text-lg text-gray-400 leading-relaxed font-medium">
-                    {step.desc}
-                  </p>
+                <div className="bg-[#111] border border-white/5 p-10 md:p-14 rounded-[3rem] shadow-2xl space-y-6 relative overflow-hidden min-h-[450px] flex flex-col justify-center transition-all duration-500 hover:border-primary/20">
+                  <div className={`absolute top-0 left-0 w-1.5 h-full ${step.color} opacity-40`} />
+                  <div className="text-7xl font-heading font-black text-white/5 absolute top-10 right-10 leading-none">
+                    {step.num}
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-4xl font-black tracking-tight uppercase leading-tight text-white">{step.title}</h3>
+                    <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                      {step.desc}
+                    </p>
+                  </div>
 
-                  {/* Decorative element */}
-                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+                  {/* Decorative background element */}
+                  <div className={`absolute -bottom-20 -right-20 w-64 h-64 ${step.color} opacity-[0.03] rounded-full blur-[100px]`} />
                 </div>
               </motion.div>
             ))}
@@ -400,26 +405,24 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-lg mx-auto"
+            {...fadeIn}
+            className="flex flex-col items-center gap-8"
           >
-            <div className="bg-white p-3 rounded-[2rem] shadow-2xl border border-border flex flex-col sm:flex-row gap-3 transition-all hover:shadow-primary/5">
+            <div className="w-full max-w-xl p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center shadow-2xl">
               <input
                 type="email"
                 placeholder="developer@agency.com"
-                className="flex-1 px-8 py-4 rounded-[1.5rem] focus:outline-none focus:ring-4 ring-primary/5 font-medium text-sm bg-gray-50/50 border border-transparent focus:border-primary/10 transition-all"
+                className="flex-1 bg-transparent border-none focus:ring-0 px-6 text-white font-medium placeholder:text-gray-600"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="btn-primary btn-glow !rounded-[1.5rem] !py-4 !px-10 !text-[11px] whitespace-nowrap shadow-primary/20"
+                className="btn-primary btn-glow !px-8 !py-3.5 !rounded-2xl !text-sm whitespace-nowrap"
               >
                 Join Now
               </motion.button>
             </div>
-            <p className="mt-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 italic">
               We respect your privacy. No spam. Guaranteed.
             </p>
           </motion.div>
