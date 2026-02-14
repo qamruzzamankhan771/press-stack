@@ -46,7 +46,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg text-text selection:bg-primary/20 overflow-x-hidden">
+    <div className="min-h-screen bg-bg text-text selection:bg-primary/20 overflow-x-hidden scroll-smooth">
 
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4 ${isScrolled ? 'bg-white/80 backdrop-blur-xl border-b border-border py-3' : 'bg-transparent'
@@ -90,14 +90,16 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
               <Sparkles size={12} className="text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary">Limited: First 50 Developers</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Limited: First 50 Developers</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-heading font-black tracking-tight leading-[1.1]">
-              Stop Rebuilding <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">WordPress</span> from Scratch
-            </h1>
-            <p className="text-lg text-gray-500 max-w-xl font-medium leading-relaxed">
-              Build fully custom WordPress themes with structured content models, plugin stacks, and export-ready starter packages — in minutes, not hours.
-            </p>
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-black tracking-tight leading-[0.9] text-gray-900">
+                Stop Rebuilding <span className="text-primary relative inline-block">WordPress<div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/20 -rotate-1" /></span> from Scratch
+              </h1>
+              <p className="text-gray-500 max-w-xl text-lg font-medium leading-relaxed">
+                Build fully custom WordPress themes with structured content models, plugin stacks, and export-ready starter packages — in minutes, not hours.
+              </p>
+            </div>
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <motion.a
@@ -210,7 +212,7 @@ export default function LandingPage() {
       <section id="features" className="py-32 px-6">
         <div className="max-w-7xl mx-auto space-y-20 text-center">
           <motion.div {...fadeIn} className="max-w-3xl mx-auto space-y-4">
-            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight leading-tight">
               PressStack Automates Your WordPress Foundation
             </h2>
             <p className="text-gray-500 font-medium">
@@ -223,7 +225,7 @@ export default function LandingPage() {
             initial="initial"
             whileInView="whileInView"
             viewport={{ once: true }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid md:grid-cols-2 gap-8"
           >
             {[
               { icon: Layers, title: 'Clean PHP Scaffolds', desc: 'Generate high-quality theme structures for fully custom WordPress themes.' },
@@ -234,13 +236,15 @@ export default function LandingPage() {
               <motion.div
                 key={i}
                 variants={fadeIn}
-                className="section-card p-8 group hover:border-primary/40 text-left cursor-default"
+                className="section-card p-10 group hover:border-primary/40 text-left cursor-default flex flex-col items-start gap-6"
               >
-                <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
-                  <feature.icon size={24} className="text-primary" />
+                <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <feature.icon size={28} className="text-primary" />
                 </div>
-                <h3 className="text-lg font-black tracking-tight mb-2 uppercase tracking-widest text-[13px]">{feature.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-black tracking-tight uppercase tracking-[0.1em] text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-500 leading-relaxed font-body">{feature.desc}</p>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -250,60 +254,75 @@ export default function LandingPage() {
               href="#early-access"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-primary btn-glow !text-sm group !px-12"
+              className="btn-primary btn-glow !text-[10px] group !px-8 !py-3.5"
             >
               Get Early Access
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </motion.a>
           </motion.div>
         </div>
       </section>
 
-      {/* 4. How It Works */}
-      <section id="how-it-works" className="py-32 bg-gray-900 text-white overflow-hidden relative px-6">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,#4f46e5,transparent)]" />
-        </div>
+      {/* 4. How It Works - Stacked Scroll Layout */}
+      <section id="how-it-works" className="py-32 bg-gray-900 text-white overflow-visible relative px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
 
-        <div className="max-w-7xl mx-auto relative z-10 space-y-20">
-          <motion.div {...fadeIn} className="text-center space-y-4">
-            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
-              Get Started in <span className="text-primary italic">3 Steps</span>
-            </h2>
-          </motion.div>
+          {/* Left Side: Sticky Content */}
+          <div className="lg:sticky lg:top-40 space-y-12">
+            <motion.div {...fadeIn} className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/30">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Process</span>
+              </div>
+              <h2 className="text-4xl md:text-7xl font-heading font-black tracking-tight leading-[0.9]">
+                Get Started in <br />
+                <span className="text-primary italic">3 Steps</span>
+              </h2>
+              <p className="text-gray-400 text-lg font-medium max-w-md leading-relaxed">
+                Our automated pipeline handles the heavy lifting, giving you a production-ready WordPress foundation in seconds.
+              </p>
+            </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 relative">
+            <motion.div {...fadeIn}>
+              <motion.a
+                href="#early-access"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-primary btn-shine btn-glow !text-sm group !px-12 !py-5 shadow-2xl shadow-primary/40 !bg-white !text-primary"
+              >
+                Join Early Access
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </motion.a>
+            </motion.div>
+          </div>
+
+          {/* Right Side: Stacked Cards */}
+          <div className="space-y-40 pb-40">
             {[
-              { num: '01', title: 'Sign up for access', desc: 'Join the waitlist — limited spots available for the MVP phase' },
-              { num: '02', title: 'Select your stack', desc: 'Choose presets for Core, Content, or Commerce (basic) logic' },
-              { num: '03', title: 'Export & Deploy', desc: 'Download and install your ready-to-use WordPress starter package' }
+              { num: '01', title: 'Sign up for access', desc: 'Join the waitlist — limited spots available for the MVP phase. We prioritize agencies and active contributors.', color: 'bg-primary' },
+              { num: '02', title: 'Select your stack', desc: 'Choose presets for Core, Content, or Commerce logic. Define your ACF models and plugin requirements.', color: 'bg-secondary' },
+              { num: '03', title: 'Export & Deploy', desc: 'Download and install your ready-to-use WordPress starter package. Fully optimized and accessible.', color: 'bg-accent' }
             ].map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.15 }}
-                viewport={{ once: true }}
-                className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl"
+                viewport={{ once: false, margin: "-100px" }}
+                className="sticky top-40 group"
               >
-                <div className="text-4xl font-heading font-black text-primary/30 mb-4">{step.num}</div>
-                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-400">{step.desc}</p>
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden h-[400px] flex flex-col justify-center transition-all duration-500 group-hover:bg-white/10">
+                  <div className={`absolute top-0 left-0 w-1 h-full ${step.color} opacity-50`} />
+                  <div className="text-6xl font-heading font-black text-primary/20">{step.num}</div>
+                  <h3 className="text-3xl font-black tracking-tight uppercase leading-none">{step.title}</h3>
+                  <p className="text-lg text-gray-400 leading-relaxed font-medium">
+                    {step.desc}
+                  </p>
+
+                  {/* Decorative element */}
+                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+                </div>
               </motion.div>
             ))}
           </div>
-
-          <motion.div {...fadeIn} className="text-center">
-            <motion.a
-              href="#early-access"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-primary !text-sm group !px-12 bg-white !text-primary hover:bg-white/90"
-            >
-              Reserve Your Spot
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </motion.a>
-          </motion.div>
         </div>
       </section>
 
@@ -408,36 +427,53 @@ export default function LandingPage() {
       </section>
 
 
-      {/* 7. Social Proof */}
-      <section className="py-32 px-6">
-        <div className="max-w-7xl mx-auto space-y-20">
-          <motion.div {...fadeIn} className="text-center space-y-4">
-            <h2 className="text-3xl font-heading font-black tracking-tight text-gray-400 uppercase tracking-[0.3em]">
-              Trusted by Developers Who Deliver WordPress Faster
-            </h2>
-          </motion.div>
+      {/* 7. Social Proof - Looped Swiper */}
+      <section className="py-32 bg-white overflow-hidden border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
+          <motion.h2 {...fadeIn} className="text-3xl md:text-5xl font-heading font-black tracking-tight text-gray-900 uppercase">
+            Trusted by Developers Who Deliver WordPress Faster
+          </motion.h2>
+        </div>
 
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              { author: 'Jordan Miller', role: 'Full-stack WP Dev', quote: "PressStack turned my 4-hour setup into a 10-minute task. The ACF mapping is genuinely frightening how accurate it is." },
-              { author: 'Sarah Chen', role: 'Agency Principal', quote: "Standardizing our theme foundations with PressStack has eliminated cross-team bugs. Every dev is finally on the same page." },
-              { author: 'Alex Rivera', role: 'Freelance Architect', quote: "The exported code is PSR-compliant and clean. No bloat, just pure WordPress logic. It's my secret weapon for high-margin projects." }
-            ].map((testi, i) => (
-              <motion.div key={i} {...fadeIn} className="space-y-6">
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, j) => <Sparkles key={j} size={10} className="text-primary fill-primary" />)}
-                </div>
-                <p className="text-lg text-gray-900 font-medium leading-relaxed italic">"{testi.quote}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-200" />
-                  <div>
-                    <h4 className="font-black text-xs uppercase tracking-widest">{testi.author}</h4>
-                    <p className="text-[10px] text-gray-500 font-bold">{testi.role}</p>
+        <div className="relative">
+          {/* Gradient Overlays */}
+          <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-white to-transparent z-10" />
+
+          {/* Scrolling Container */}
+          <motion.div
+            animate={{ x: [0, -2000] }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="flex gap-8 whitespace-nowrap"
+          >
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex gap-8">
+                {[
+                  { name: 'Alex Rivera', role: 'Senior WP Developer', text: 'PressStack cut our agency setup time by 70%. The clean PHP output is exactly what we needed.' },
+                  { name: 'Sarah Chen', role: 'Freelance Designer', text: 'I can now build complex ACF structures in minutes. It has completely changed my workflow.' },
+                  { name: 'Marcus Thorne', role: 'Agency Owner', text: 'Standardizing our stack across the team has never been easier. v3 is a game changer.' },
+                  { name: 'Elena Frost', role: 'Full Stack Engineer', text: 'The export-ready packages are perfect. No bloat, just clean, production-ready code.' },
+                  { name: 'David Kim', role: 'WordPress Architect', text: 'Finally, a tool that respects developer boundaries while automating the boring stuff.' }
+                ].map((testimonial, idx) => (
+                  <div
+                    key={idx}
+                    className="w-[400px] bg-gray-50 border border-border p-8 rounded-3xl whitespace-normal flex flex-col justify-between gap-6 hover:shadow-xl hover:border-primary/20 transition-all cursor-default"
+                  >
+                    <p className="text-gray-600 font-medium italic leading-relaxed">"{testimonial.text}"</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs">
+                        {testimonial.name[0]}
+                      </div>
+                      <div>
+                        <div className="font-black text-sm uppercase tracking-widest text-gray-900">{testimonial.name}</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{testimonial.role}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                ))}
+              </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
