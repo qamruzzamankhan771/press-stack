@@ -1,501 +1,477 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  FileCode,
-  Settings,
-  Code,
-  Copy,
-  Download,
-  Trash2,
+  Orbit,
+  ArrowRight,
   Zap,
-  Check,
-  AlertCircle,
+  Shield,
   Layout,
   CheckCircle2,
+  Smartphone,
+  Cpu,
+  Palette,
+  Code2,
+  Download,
+  Users,
+  Layers,
   Sparkles,
-  RefreshCw,
-  Eye,
-  Github,
-  Orbit
+  Settings,
+  Github
 } from 'lucide-react';
-import { formatHTML, formatPHP } from '@/lib/formatters';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-php';
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-json';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
-interface OutputState {
-  php: string;
-  acf: any;
-  model: any[];
-  optimizedHtml: string;
-}
-
-export default function Home() {
-  const [htmlInput, setHtmlInput] = useState('');
-  const [templateName, setTemplateName] = useState('custom-section');
-  const [includeHeader, setIncludeHeader] = useState(true);
-  const [output, setOutput] = useState<OutputState | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'php' | 'acf' | 'preview'>('php');
-  const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const phpRef = useRef<HTMLElement>(null);
-  const htmlRef = useRef<HTMLElement>(null);
-  const acfRef = useRef<HTMLElement>(null);
-
-  // Handle Scroll for Header
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPos = window.scrollY || document.documentElement.scrollTop;
-      setIsScrolled(scrollPos > 10);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Syntax Highlighting Effect
-  useEffect(() => {
-    if (output) {
-      try {
-        // Ensure languages are available
-        if (Prism.languages.php && Prism.languages.markup && Prism.languages.json) {
-          Prism.highlightAll();
-        } else {
-          // Fallback or re-initialize
-          setTimeout(() => Prism.highlightAll(), 100);
-        }
-      } catch (e) {
-        console.warn('Prism highlighting deferred:', e);
-      }
-    }
-  }, [output, activeTab]);
-
-  // Live Conversion
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (htmlInput.trim()) {
-        handleConvert(false);
-      }
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [htmlInput, templateName, includeHeader]);
-
-  const handleConvert = async (isManual = true) => {
-    if (!htmlInput.trim()) return;
-
-    if (isManual) setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/convert', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          html: htmlInput,
-          templateName: templateName,
-          includeHeader: includeHeader
-        }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        setOutput({
-          php: formatPHP(data.php),
-          acf: data.acf,
-          model: data.model,
-          optimizedHtml: data.optimizedHtml
-        });
-      } else {
-        setError(data.error || 'Conversion failed');
-      }
-    } catch (err) {
-      if (isManual) setError('Connection failure. Check if the server is running.');
-    } finally {
-      if (isManual) setLoading(false);
-    }
+  const fadeIn = {
+    initial: { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 }
   };
 
-  const handleClear = () => {
-    setHtmlInput('');
-    setOutput(null);
-    setError(null);
-  };
-
-  const copyToClipboard = () => {
-    const text = activeTab === 'php' ? output?.php :
-      activeTab === 'acf' ? JSON.stringify(output?.acf, null, 2) :
-        output?.optimizedHtml;
-    if (!text) return;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleManualFormat = () => {
-    if (!output) return;
-    setOutput(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        php: formatPHP(prev.php),
-        optimizedHtml: formatHTML(prev.optimizedHtml)
-      };
-    });
-  };
-
-  const handleManualFormatInput = () => {
-    if (htmlInput) setHtmlInput(formatHTML(htmlInput));
-    if (output) {
-      setOutput({
-        ...output,
-        php: formatPHP(output.php),
-        optimizedHtml: formatHTML(output.optimizedHtml)
-      });
-    }
-  };
-
-  const loadSampleHTML = () => {
-    const sample = `<section class="feature-block">
-  <div class="wrap">
-    <h2>Our Core Features</h2>
-    <div class="grid">
-      <div class="item">
-        <img src="icon1.svg" alt="Quick Launch">
-        <h3>Lightning Fast</h3>
-        <p>Optimized compiled code for maximum speed.</p>
-      </div>
-      <div class="item">
-        <img src="icon2.svg" alt="Secure">
-        <h3>Secure by Design</h3>
-        <p>Enterprise grade security for your templates.</p>
-        <a href="/security">Learn More</a>
-      </div>
-    </div>
-  </div>
-</section>`;
-    setHtmlInput(sample.trim());
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+  const staggerContainer = {
+    initial: { opacity: 0 },
+    whileInView: { opacity: 1 },
+    viewport: { once: true },
+    transition: { staggerChildren: 0.1 }
   };
 
   return (
-    <div className="min-h-screen bg-bg text-text selection:bg-primary/20">
+    <div className="min-h-screen bg-bg text-text selection:bg-primary/20 overflow-x-hidden">
 
-      {/* Tooltip Overlay */}
-      <AnimatePresence>
-        {copied && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 10, x: "-50%" }}
-            className="tooltip tooltip-visible left-1/2 flex items-center gap-2"
-          >
-            <CheckCircle2 size={12} className="text-secondary" />
-            Code Copied to Clipboard
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Modern Header */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 px-6 py-4 flex items-center justify-between ${isScrolled ? 'bg-white/80 backdrop-blur-xl border-b border-border py-3 shadow-md' : 'bg-bg/50'
-          }`}
-      >
-        <div className="flex items-center gap-3">
-          <motion.div
-            whileHover={{ rotate: 15 }}
-            className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20"
-          >
-            <Orbit className="text-white" size={20} />
-          </motion.div>
-          <div className="flex flex-col">
-            <span className="text-lg font-heading font-black tracking-tight leading-none">PRESS STACK</span>
-            <span className="text-[9px] font-black tracking-[0.3em] text-primary/60 uppercase">Studio Mode</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleClear}
-            className="hidden sm:flex btn-secondary !py-2 !px-4 !text-xs"
-            aria-label="Clear all inputs"
-          >
-            <Trash2 size={14} />
-            Reset
-          </button>
-          <button
-            disabled={!output}
-            onClick={() => {/* Mock download */ }}
-            className="btn-primary !py-2 !px-5 !text-xs shadow-none hover:shadow-lg"
-            aria-label="Export generated files"
-          >
-            <Download size={14} />
-            Export Bundle
-          </button>
-        </div>
-      </header>
-
-      {/* Content Scrolled */}
-      <main className="pt-28 pb-20 px-6 max-w-7xl mx-auto space-y-10">
-
-        {/* Headline */}
-        <motion.section
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="text-center space-y-3"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10 mb-2">
-            <Sparkles size={12} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Compiler v3.3.0 Stable</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
-            Static to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Dynamic WordPress</span>
-          </h1>
-          <p className="text-sm text-gray-500 max-w-xl mx-auto font-medium">
-            The mandatory architectural gatekeeper. Automatically handles landmarks, heading hierarchy, and WCAG accessibility standards.
-          </p>
-        </motion.section>
-
-        {/* Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-          {/* Input Panel */}
-          <motion.section
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-5 space-y-6"
-          >
-            <div className="section-card p-6 space-y-6">
-
-              {/* Controls */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Project Configuration</h2>
-                  <button
-                    onClick={loadSampleHTML}
-                    className="text-primary font-bold text-[10px] uppercase tracking-widest hover:underline"
-                    aria-label="Load sample HTML"
-                  >
-                    Load Sample
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Template Identifier</label>
-                    <input
-                      type="text"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value.replace(/[^a-zA-Z0-9_\- ]/g, ''))}
-                      className="input-field !text-sm"
-                      placeholder="e.g. Services Landing"
-                      aria-label="WordPress Template Name or Slug"
-                    />
-                  </div>
-
-                  {/* Accessible Checkbox */}
-                  <div className="flex flex-col gap-2">
-                    <label
-                      className="custom-checkbox group h-14 bg-bg rounded-2xl border border-border px-5 hover:border-primary/20 transition-all flex items-center"
-                      htmlFor="header-toggle"
-                    >
-                      <input
-                        id="header-toggle"
-                        type="checkbox"
-                        className="sr-only"
-                        checked={includeHeader}
-                        onChange={() => setIncludeHeader(!includeHeader)}
-                      />
-                      <div className="checkbox-box group-hover:border-primary/60">
-                        <Check className="checkbox-tick" size={14} strokeWidth={4} aria-hidden="true" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-text mb-0.5">Add Template Name</span>
-                        <span className="text-[10px] text-gray-400 font-medium">Include WordPress metadata header</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Source Code */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Static HTML Source</h2>
-                  <button
-                    onClick={handleManualFormat}
-                    className="btn-secondary !py-1 !px-3 !text-[10px] !rounded-lg border-none hover:bg-primary/5 text-primary"
-                    aria-label="Format source code"
-                  >
-                    <RefreshCw size={10} />
-                    Format
-                  </button>
-                </div>
-                <div className="relative group overflow-hidden rounded-2xl border-2 border-border focus-within:border-primary/30 transition-all">
-                  <textarea
-                    value={htmlInput}
-                    onChange={(e) => setHtmlInput(e.target.value)}
-                    className="w-full h-[400px] p-5 font-mono text-xs resize-none focus:outline-none bg-white text-gray-600 custom-scrollbar leading-relaxed"
-                    placeholder="<!-- Paste your raw HTML here -->"
-                    aria-label="Paste HTML for conversion"
-                  />
-                  {loading && (
-                    <div className="absolute top-4 right-4 animate-spin text-primary">
-                      <RefreshCw size={14} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Output Panel */}
-          <motion.section
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-7 flex flex-col min-h-[700px]"
-          >
-            <div className="section-card p-6 flex flex-col h-full bg-white">
-
-              {/* Tab Navigation */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                <div className="flex p-1 bg-bg rounded-xl w-full sm:w-auto border border-border">
-                  {[
-                    { id: 'php', icon: FileCode, label: 'PHP Template' },
-                    { id: 'acf', icon: Settings, label: 'ACF Metadata' },
-                    { id: 'preview', icon: Eye, label: 'Optimized DOM' }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg transition-all font-bold text-[10px] uppercase tracking-wider ${activeTab === tab.id
-                        ? 'bg-white text-primary shadow-sm ring-1 ring-border'
-                        : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                      aria-label={`Show ${tab.label}`}
-                    >
-                      <tab.icon size={12} />
-                      {tab.label.split(' ')[0]}
-                    </button>
-                  ))}
-                </div>
-
-                {output && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleManualFormat}
-                      className="btn-secondary !py-2 !px-4 !text-[10px] !rounded-xl transition-all"
-                      aria-label="Format output code"
-                    >
-                      <RefreshCw size={12} />
-                      Format
-                    </button>
-                    <button
-                      onClick={copyToClipboard}
-                      className="btn-secondary !py-2 !px-4 !text-[10px] !rounded-xl group relative overflow-hidden"
-                      aria-label="Copy output to clipboard"
-                    >
-                      <Copy size={12} className="group-active:scale-95 transition-transform" />
-                      Copy Code
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Code Surface */}
-              <div className="flex-1 bg-gray-50 rounded-2xl overflow-hidden relative border border-border">
-                <div className="h-full overflow-auto p-6 custom-scrollbar">
-                  {output ? (
-                    <pre className={`line-numbers language-${activeTab === 'php' ? 'php' : activeTab === 'acf' ? 'json' : 'markup'}`}>
-                      <code className={`language-${activeTab === 'php' ? 'php' : activeTab === 'acf' ? 'json' : 'markup'}`}>
-                        {activeTab === 'php' ? output.php :
-                          activeTab === 'acf' ? JSON.stringify(output.acf, null, 2) :
-                            output.optimizedHtml}
-                      </code>
-                    </pre>
-                  ) : (
-                    <div className="h-[500px] flex flex-col items-center justify-center text-center space-y-4 opacity-30 select-none">
-                      <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-3xl flex items-center justify-center">
-                        <Layout size={24} className="text-gray-400" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-heading font-black uppercase tracking-[0.2em] text-sm italic">Waiting for input</p>
-                        <p className="text-[10px] font-bold">The compiler will process code live.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Float Badge */}
-                {output && (
-                  <div className="absolute bottom-4 right-6 pointer-events-none">
-                    <div className="bg-white/80 backdrop-blur border border-border px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-                      <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">
-                        {activeTab.toUpperCase()} Mode
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Stats / Status Bar */}
-              {output && (
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 px-2">
-                  <div className="flex items-center gap-5">
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle2 size={12} className="text-primary" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Semantic Tree Verified</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle2 size={12} className="text-secondary" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Accessibility Normalized</span>
-                    </div>
-                  </div>
-                  <div className="text-[9px] font-black uppercase tracking-widest italic flex items-center gap-1 text-gray-300">
-                    Industrial Architecture v3.2
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.section>
-
-        </div>
-      </main>
-
-      {/* Modern Footer */}
-      <footer className="border-t border-border mt-20 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4 ${isScrolled ? 'bg-white/80 backdrop-blur-xl border-b border-border py-3' : 'bg-transparent'
+        }`}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Orbit size={14} className="text-gray-300" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300">Press Stack Intelligence</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+              <Orbit className="text-white" size={16} />
+            </div>
+            <span className="text-lg font-heading font-black tracking-tight leading-none">PRESS STACK</span>
           </div>
-          <div className="flex items-center gap-6">
-            {['Architecture', 'Security', 'Compliance'].map(item => (
-              <a
-                key={item}
-                href="#"
-                className="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary transition-colors py-1 relative group"
-              >
-                {item}
-                <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all group-hover:w-full" />
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary transition-colors">Features</a>
+            <a href="#pricing" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary transition-colors">Pricing</a>
+            <Link href="/compiler" className="btn-primary !py-2 !px-5 !text-xs !rounded-xl">
+              Launch Studio
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* 1. Hero Section */}
+      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
+              <Sparkles size={12} className="text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary">MVP Early Access Open</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-heading font-black tracking-tight leading-[1.1]">
+              Stop Rebuilding <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">WordPress</span> from Scratch
+            </h1>
+            <p className="text-lg text-gray-500 max-w-xl font-medium leading-relaxed">
+              Build custom WordPress themes with structured content models, plugin stacks, and export-ready starter packages — in minutes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/compiler" className="btn-primary !text-sm group">
+                Start Free Export
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+              <a href="#how-it-works" className="btn-secondary !text-sm">
+                How It Works
               </a>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="relative lg:block"
+          >
+            <div className="section-card aspect-square bg-[#0c111d] border-gray-800 p-8 shadow-2xl overflow-hidden group">
+              <div className="flex items-center gap-2 mb-6 opacity-30">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+              </div>
+              <div className="font-mono text-sm text-primary/70 mb-4 tracking-tight">
+                <span className="text-white">export const</span> <span className="text-secondary">pressStack</span> = () =&gt; &#123;
+              </div>
+              <div className="pl-6 font-mono text-sm text-gray-400 space-y-2">
+                <div>type: <span className="text-accent">'WordPress_Theme'</span>,</div>
+                <div>logic: <span className="text-accent">'ACF_Pro'</span>,</div>
+                <div>optimized: <span className="text-secondary">true</span>,</div>
+                <div>accessibility: <span className="text-primary">'WCAG_2.1'</span></div>
+              </div>
+              <div className="font-mono text-sm text-primary/70 mt-4 tracking-tight">
+                &#125;;
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0c111d] via-transparent to-transparent pointer-events-none" />
+
+              {/* Floating Element */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-1/2 right-10 bg-white shadow-xl rounded-2xl p-4 border border-border"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle2 size={16} className="text-green-600" />
+                  </div>
+                  <div className="text-[10px] font-black uppercase tracking-widest">Compiler Stable</div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 2. Problem Section */}
+      <section className="py-24 bg-gray-50 border-y border-border px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div {...fadeIn}>
+            <h2 className="text-3xl md:text-5xl font-heading font-black tracking-tight mb-8">
+              Developers Waste Hours on Repetitive WordPress Setup
+            </h2>
+            <ul className="space-y-6">
+              {[
+                { title: 'Manual ACF Configuration', desc: 'Defining fields and field groups one by one is a soul-crushing chore.' },
+                { title: 'Inconsistent Semantic Code', desc: 'Rebuilding clean PHP scaffolds from scratch leads to inconsistency.' },
+                { title: 'Accessibility Overhead', desc: 'Manually ensuring every landmark and aria-label is correct takes focus away from design.' },
+                { title: 'Setup Fatigue', desc: 'Repeating the same core workflow for every client reduces your hourly rate.' }
+              ].map((item, i) => (
+                <li key={i} className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-red-100 flex-shrink-0 flex items-center justify-center mt-1">
+                    <div className="w-2 h-2 rounded-full bg-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900">{item.title}</h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="section-card p-1 bg-white shadow-2xl rotate-1"
+          >
+            <div className="bg-[#0c111d] p-10 rounded-[22px] flex flex-col items-center justify-center gap-6 min-h-[350px]">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                <Settings size={64} className="text-primary animate-spin-slow relative z-10" />
+              </div>
+              <p className="text-gray-400 font-mono text-xs text-center uppercase tracking-widest italic animate-pulse">
+                processing manual tasks...
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 3. Solution Section */}
+      <section id="features" className="py-32 px-6">
+        <div className="max-w-7xl mx-auto space-y-20 text-center">
+          <motion.div {...fadeIn} className="max-w-3xl mx-auto space-y-4">
+            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
+              PressStack Automates Your Foundation
+            </h2>
+            <p className="text-gray-500 font-medium">
+              We handle the grunt work so you can focus on the premium architecture.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="whileInView"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {[
+              { icon: Layers, title: 'Project Scaffold', desc: 'Generate clean theme structures, standardizing your team workflow.' },
+              { icon: Code2, title: 'ACF Builder', desc: 'Automatic creation of field groups and sub-fields from your HTML source.' },
+              { icon: Shield, title: 'Safe Export', desc: 'Production-ready code that follows WordPress best practices and security.' },
+              { icon: Zap, title: 'Instant Packages', desc: 'Download deployable ZIP files containing all templates and logic.' }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                variants={fadeIn}
+                className="section-card p-8 group hover:border-primary/40 text-left cursor-default"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
+                  <feature.icon size={24} className="text-primary" />
+                </div>
+                <h3 className="text-lg font-black tracking-tight mb-2 uppercase tracking-widest text-[13px]">{feature.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 4. How It Works */}
+      <section id="how-it-works" className="py-32 bg-gray-900 text-white overflow-hidden relative px-6">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,#4f46e5,transparent)]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10 space-y-20">
+          <motion.div {...fadeIn} className="text-center space-y-4">
+            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
+              From Zero to Deployable in <span className="text-primary italic">4 Steps</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-4 gap-4 relative">
+            <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 hidden md:block" />
+            {[
+              { num: '01', title: 'Import Source', desc: 'Paste your raw static HTML structure' },
+              { num: '02', title: 'Choose Stack', desc: 'Select presets for ACF and Theme logic' },
+              { num: '03', title: 'Define Models', desc: 'Refine field names and groupings' },
+              { num: '04', title: 'Export & Fly', desc: 'Download your ready-to-use theme zip' }
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.15 }}
+                viewport={{ once: true }}
+                className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl"
+              >
+                <div className="text-4xl font-heading font-black text-primary/30 mb-4">{step.num}</div>
+                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-400">{step.desc}</p>
+              </motion.div>
             ))}
           </div>
-          <p className="text-[9px] font-bold text-gray-300">© 2026 DEEPMIND ADVANCED ARCHITECTURE PROJECT</p>
+
+          <motion.div {...fadeIn} className="text-center">
+            <Link href="/compiler" className="btn-primary !text-sm group !px-10">
+              Start Your First Project
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 5. Benefits Section */}
+      <section className="py-32 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-20">
+          <motion.div {...fadeIn} className="lg:w-1/2 space-y-10">
+            <div className="space-y-4 text-center lg:text-left">
+              <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tight">
+                Why Developers & Agencies Love PressStack
+              </h2>
+              <p className="text-gray-500 font-medium max-w-xl mx-auto lg:mx-0">
+                Performance isn't just about code; it's about the speed of your delivery pipeline.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-8">
+              {[
+                { title: 'Save 2–5 Hours', desc: 'Per project, per developer. Reclaim your focus.' },
+                { title: 'Standardized Workflow', desc: 'Maintain codebase consistency across teams.' },
+                { title: 'Professional PHP', desc: 'PSR-compliant code that senior devs love.' },
+                { title: 'Reduced Setup Errors', desc: 'Automated field mapping prevents human error.' }
+              ].map((benefit, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-primary" />
+                    <h3 className="font-black text-[11px] uppercase tracking-widest text-gray-900">{benefit.title}</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed pl-6">{benefit.desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="lg:w-1/2 relative"
+          >
+            <div className="absolute -inset-10 bg-primary/20 blur-3xl rounded-full" />
+            <div className="relative section-card bg-white p-12 text-center space-y-6">
+              <div className="text-7xl font-heading font-black text-primary leading-none">95%</div>
+              <div className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">Time Reduction in Prep</div>
+              <div className="pt-8 border-t border-border mt-4 flex justify-between gap-4">
+                <div className="flex-1 text-left">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Traditional</div>
+                  <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gray-300 w-full" />
+                  </div>
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1 italic">PressStack</div>
+                  <div className="h-1 bg-primary/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary w-[5%]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 6. Pricing Section */}
+      <section id="pricing" className="py-32 bg-gray-50 border-y border-border px-6">
+        <div className="max-w-7xl mx-auto space-y-20">
+          <motion.div {...fadeIn} className="text-center space-y-4">
+            <h2 className="text-4xl md:text-6xl font-heading font-black tracking-tight uppercase">
+              Get Early Access Today
+            </h2>
+            <p className="text-gray-500 font-medium italic">Limited spots available for the Lifetime Studio license.</p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-3 gap-8 items-end">
+            {/* Free */}
+            <motion.div {...fadeIn} className="section-card p-10 bg-white">
+              <div className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Free Tier</div>
+              <div className="text-5xl font-heading font-black text-gray-900 mb-8">$0</div>
+              <ul className="space-y-4 mb-10">
+                {['1 Theme Export', 'Core WP Structure', 'Basic ACF Mapping', 'Community Docs'].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-gray-500">
+                    <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/compiler" className="btn-secondary !w-full !text-sm">Start Free</Link>
+            </motion.div>
+
+            {/* Pro - Recommended */}
+            <motion.div
+              initial={{ opacity: 0, scale: 1.05, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1.05, y: -20 }}
+              viewport={{ once: true }}
+              className="section-card p-12 bg-[#0c111d] border-primary/30 relative z-10 shadow-2xl"
+            >
+              <div className="absolute top-0 right-10 -translate-y-1/2 bg-primary px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white italic">Most Popular</div>
+              <div className="text-xs font-black uppercase tracking-widest text-primary/70 mb-6">Professional</div>
+              <div className="text-5xl font-heading font-black text-white mb-2">$19</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8">per month</div>
+              <ul className="space-y-4 mb-10 text-gray-300">
+                {['Unlimited Exports', 'Full ACF Pro Integration', 'WooCommerce Layout Presets', 'Standardized Logic Engine', 'Priority Build Support'].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-sm">
+                    <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-primary !w-full !text-sm shadow-primary/20">Upgrade to Pro</button>
+            </motion.div>
+
+            {/* Lifetime */}
+            <motion.div {...fadeIn} className="section-card p-10 bg-white">
+              <div className="text-xs font-black uppercase tracking-widest text-secondary mb-6">Early Adopter</div>
+              <div className="text-5xl font-heading font-black text-gray-900 mb-2">$99</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8">one-time payment</div>
+              <ul className="space-y-4 mb-10 text-gray-500">
+                {['Lifetime Pro Access', 'All Future Engine Updates', 'Private Slack Channel', 'Influencer Badge', 'Custom Core Preset Request'].map((f, i) => (
+                  <li key={i} className="flex gap-3 text-sm">
+                    <CheckCircle2 size={16} className="text-secondary flex-shrink-0" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <button className="btn-secondary !w-full !text-sm border-secondary text-secondary hover:bg-secondary/5">Claim Lifetime Spot</button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Social Proof */}
+      <section className="py-32 px-6">
+        <div className="max-w-7xl mx-auto space-y-20">
+          <motion.div {...fadeIn} className="text-center space-y-4">
+            <h2 className="text-3xl font-heading font-black tracking-tight text-gray-400 uppercase tracking-[0.3em]">
+              Trusted by Developers Who Deliver WordPress Faster
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              { author: 'Jordan Miller', role: 'Full-stack WP Dev', quote: "PressStack turned my 4-hour setup into a 10-minute task. The ACF mapping is genuinely frightening how accurate it is." },
+              { author: 'Sarah Chen', role: 'Agency Principal', quote: "Standardizing our theme foundations with PressStack has eliminated cross-team bugs. Every dev is finally on the same page." },
+              { author: 'Alex Rivera', role: 'Freelance Architect', quote: "The exported code is PSR-compliant and clean. No bloat, just pure WordPress logic. It's my secret weapon for high-margin projects." }
+            ].map((testi, i) => (
+              <motion.div key={i} {...fadeIn} className="space-y-6">
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, j) => <Sparkles key={j} size={10} className="text-primary fill-primary" />)}
+                </div>
+                <p className="text-lg text-gray-900 font-medium leading-relaxed italic">"{testi.quote}"</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-200" />
+                  <div>
+                    <h4 className="font-black text-xs uppercase tracking-widest">{testi.author}</h4>
+                    <p className="text-[10px] text-gray-500 font-bold">{testi.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Footer */}
+      <footer className="border-t border-border py-20 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+          <div className="col-span-1 md:col-span-2 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Orbit className="text-primary" size={16} />
+              </div>
+              <span className="text-lg font-heading font-black tracking-tight leading-none uppercase">PRESS STACK</span>
+            </div>
+            <p className="text-sm text-gray-500 max-w-sm leading-relaxed">
+              The developer-first WordPress stack builder. Minimal UI, maximum control. Built for agencies and individual contributors who value their time.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Engine</h4>
+            <ul className="space-y-4">
+              {['Compiler', 'Formatters', 'Optimization', 'Scaffold'].map(item => (
+                <li key={item}><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors font-medium">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black uppercase tracking-widest text-primary">Resources</h4>
+            <ul className="space-y-4">
+              {['Documentation', 'FAQ', 'Contact Support', 'Privacy Policy'].map(item => (
+                <li key={item}><a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors font-medium">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <Github size={18} className="text-gray-400 hover:text-primary cursor-pointer transition-colors" />
+          </div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">
+            © 2026 DEEPMIND ADVANCED ARCHITECTURE PROJECT | v3.3.1 Stable
+          </p>
         </div>
       </footer>
     </div>
