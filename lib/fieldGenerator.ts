@@ -1,4 +1,5 @@
-import { Cheerio, CheerioAPI, Element } from 'cheerio';
+import { CheerioAPI } from 'cheerio';
+type Element = any; // Safe fallback for build stability across Cheerio versions
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ParsedField {

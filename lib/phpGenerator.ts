@@ -83,7 +83,7 @@ export const generatePHP = (
     const $body = $('body').length > 0 ? $('body').empty() : $.root().empty();
     rebuildFromMapping(fields, $body);
 
-    let finalOutput = $body.html() || $.html();
+    let finalOutput = ($body as any).html() || $.html();
 
     // Multi-pass placeholder expansion
     let safeguard = 0;
