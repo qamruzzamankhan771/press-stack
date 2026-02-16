@@ -18,9 +18,13 @@ import {
   RefreshCw,
   Eye,
   Github,
-  Orbit
+  Orbit,
+  Save,
+  Loader2,
+  Plus
 } from 'lucide-react';
 import { formatHTML, formatPHP } from '@/lib/formatters';
+import Link from 'next/link';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-php';
 import 'prismjs/components/prism-markup';
@@ -31,22 +35,25 @@ interface OutputState {
   acf: any;
   model: any[];
   optimizedHtml: string;
+  assets: string[];
 }
 
 export default function Home() {
   const [htmlInput, setHtmlInput] = useState('');
-  const [templateName, setTemplateName] = useState('custom-section');
-  const [includeHeader, setIncludeHeader] = useState(true);
   const [output, setOutput] = useState<OutputState | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'php' | 'acf' | 'preview'>('php');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  const phpRef = useRef<HTMLElement>(null);
-  const htmlRef = useRef<HTMLElement>(null);
-  const acfRef = useRef<HTMLElement>(null);
+  // Project Context
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [pageName, setPageName] = useState('Home Page');
+  const [templateSlug, setTemplateSlug] = useState('home');
+  const [templateType, setTemplateType] = useState<'full-page' | 'section'>('full-page');
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
   // Handle Scroll for Header
   useEffect(() => {
@@ -56,18 +63,51 @@ export default function Home() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial check
+
+    // Fetch Projects
+    fetch('/api/projects').then(res => res.json()).then(setProjects).catch(console.error);
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Sync with URL and project selection
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pId = params.get('projectId');
+    if (pId) setSelectedProjectId(pId);
+  }, []);
+
+  // Auto-generate slug from page name
+  useEffect(() => {
+    const slug = pageName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    setTemplateSlug(slug || 'untitled');
+  }, [pageName]);
+
+  // Handle Page Selection
+  const handleSelectPage = (page: any) => {
+    setSelectedPageId(page.id);
+    setPageName(page.name);
+    setTemplateSlug(page.slug);
+    setTemplateType(page.templateType || 'full-page');
+
+    // Fetch original HTML if stored
+    if (selectedProjectId) {
+      fetch(`/api/projects/pages?projectId=${selectedProjectId}&pageId=${page.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.htmlContent) setHtmlInput(data.htmlContent);
+        })
+        .catch(console.error);
+    }
+  };
 
   // Syntax Highlighting Effect
   useEffect(() => {
     if (output) {
       try {
-        // Ensure languages are available
         if (Prism.languages.php && Prism.languages.markup && Prism.languages.json) {
           Prism.highlightAll();
         } else {
-          // Fallback or re-initialize
           setTimeout(() => Prism.highlightAll(), 100);
         }
       } catch (e) {
@@ -84,7 +124,7 @@ export default function Home() {
       }
     }, 800);
     return () => clearTimeout(timer);
-  }, [htmlInput, templateName, includeHeader]);
+  }, [htmlInput, pageName, templateSlug, templateType]);
 
   const handleConvert = async (isManual = true) => {
     if (!htmlInput.trim()) return;
@@ -97,8 +137,10 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           html: htmlInput,
-          templateName: templateName,
-          includeHeader: includeHeader
+          templateName: pageName,
+          templateSlug: templateSlug,
+          templateType: templateType,
+          projectId: selectedProjectId
         }),
       });
       const data = await response.json();
@@ -108,7 +150,8 @@ export default function Home() {
           php: formatPHP(data.php),
           acf: data.acf,
           model: data.model,
-          optimizedHtml: data.optimizedHtml
+          optimizedHtml: data.optimizedHtml,
+          assets: data.assets || []
         });
       } else {
         setError(data.error || 'Conversion failed');
@@ -117,6 +160,37 @@ export default function Home() {
       if (isManual) setError('Connection failure. Check if the server is running.');
     } finally {
       if (isManual) setLoading(false);
+    }
+  };
+
+  const handleSaveToProject = async () => {
+    if (!output || !selectedProjectId) return;
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/projects/pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: selectedProjectId,
+          pageName: pageName,
+          templateSlug: templateSlug,
+          templateType: templateType,
+          phpContent: output.php,
+          acfContent: output.acf,
+          htmlContent: htmlInput,
+          assetDependencies: output.assets
+        }),
+      });
+      if (res.ok) {
+        setSaveStatus('success');
+        // Refresh project data to show new page in side panel
+        fetch('/api/projects').then(res => res.json()).then(setProjects).catch(console.error);
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (err) {
+      setSaveStatus('error');
     }
   };
 
@@ -210,19 +284,29 @@ export default function Home() {
           }`}
       >
         <div className="flex items-center gap-3">
-          <motion.div
-            whileHover={{ rotate: 15 }}
-            className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20"
-          >
-            <Orbit className="text-white" size={20} />
-          </motion.div>
-          <div className="flex flex-col">
-            <span className="text-lg font-heading font-black tracking-tight leading-none">PRESS STACK</span>
-            <span className="text-[9px] font-black tracking-[0.3em] text-primary/60 uppercase">Studio Mode</span>
-          </div>
+          <Link href="/projects" className="flex items-center gap-3">
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20"
+            >
+              <Orbit className="text-white" size={20} />
+            </motion.div>
+            <div className="flex flex-col">
+              <span className="text-lg font-heading font-black tracking-tight leading-none">PRESS STACK</span>
+              <span className="text-[9px] font-black tracking-[0.3em] text-primary/60 uppercase">Studio Mode</span>
+            </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-3">
+          {selectedProjectId && (
+            <div className="hidden md:flex items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 mr-4">
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">Target:</span>
+              <span className="text-[11px] font-bold text-gray-900 uppercase">
+                {projects.find(p => p.id === selectedProjectId)?.name || 'Project'}
+              </span>
+            </div>
+          )}
           <button
             onClick={handleClear}
             className="hidden sm:flex btn-secondary !py-2 !px-4 !text-xs"
@@ -232,41 +316,103 @@ export default function Home() {
             Reset
           </button>
           <button
-            disabled={!output}
-            onClick={() => {/* Mock download */ }}
-            className="btn-primary !py-2 !px-5 !text-xs shadow-none hover:shadow-lg"
-            aria-label="Export generated files"
+            disabled={!output || !selectedProjectId || saveStatus === 'saving'}
+            onClick={handleSaveToProject}
+            className="btn-primary !py-2 !px-5 !text-xs shadow-none hover:shadow-lg disabled:bg-gray-200"
           >
-            <Download size={14} />
-            Export Bundle
+            {saveStatus === 'saving' ? (
+              <Loader2 className="animate-spin" size={14} />
+            ) : saveStatus === 'success' ? (
+              <Check size={14} />
+            ) : (
+              <Save size={14} />
+            )}
+            {saveStatus === 'saving' ? 'Deploying...' : saveStatus === 'success' ? 'Saved' : 'Save to Project'}
           </button>
         </div>
       </header>
 
       {/* Content Scrolled */}
       <main className="pt-28 pb-20 px-6 max-w-7xl mx-auto space-y-10">
-
-        {/* Headline */}
-        <motion.section
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="text-center space-y-3"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10 mb-2">
-            <Sparkles size={12} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Compiler v3.3.0 Stable</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-heading font-black tracking-tight">
-            Static to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Dynamic WordPress</span>
-          </h1>
-          <p className="text-sm text-gray-500 max-w-xl mx-auto font-medium">
-            The mandatory architectural gatekeeper. Automatically handles landmarks, heading hierarchy, and WCAG accessibility standards.
-          </p>
-        </motion.section>
+        {/* ... Headline ... */}
 
         {/* Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          {/* Side Panel: Page Management */}
+          <motion.aside
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.05 }}
+            className="lg:col-span-2 space-y-4"
+          >
+            <div className="section-card p-4 space-y-4 bg-gray-50/50">
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Library</h2>
+                <button
+                  onClick={() => {
+                    setSelectedPageId(null);
+                    setPageName('New Page');
+                    setTemplateSlug('new-page');
+                    setHtmlInput('');
+                  }}
+                  className="p-1 hover:bg-primary/10 rounded-md text-primary transition-colors"
+                  title="New Page"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Pages Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[9px] font-black uppercase text-gray-400">Pages</span>
+                    <span className="text-[9px] font-bold bg-gray-200 px-1.5 py-0.5 rounded-full text-gray-500">
+                      {projects.find(p => p.id === selectedProjectId)?.pages.filter((p: any) => p.templateType === 'full-page').length || 0}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {projects.find(p => p.id === selectedProjectId)?.pages
+                      .filter((p: any) => p.templateType === 'full-page')
+                      .map((page: any) => (
+                        <button
+                          key={page.id}
+                          onClick={() => handleSelectPage(page)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-bold transition-all truncate ${selectedPageId === page.id ? 'bg-primary text-white shadow-md' : 'hover:bg-white hover:shadow-sm text-gray-600'}`}
+                        >
+                          {page.name}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Sections Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[9px] font-black uppercase text-gray-400">Sections</span>
+                    <span className="text-[9px] font-bold bg-gray-200 px-1.5 py-0.5 rounded-full text-gray-500">
+                      {projects.find(p => p.id === selectedProjectId)?.pages.filter((p: any) => p.templateType === 'section').length || 0}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {projects.find(p => p.id === selectedProjectId)?.pages
+                      .filter((p: any) => p.templateType === 'section')
+                      .map((page: any) => (
+                        <button
+                          key={page.id}
+                          onClick={() => handleSelectPage(page)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-bold transition-all truncate ${selectedPageId === page.id ? 'bg-primary text-white shadow-md' : 'hover:bg-white hover:shadow-sm text-gray-600'}`}
+                        >
+                          {page.name}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.aside>
 
           {/* Input Panel */}
           <motion.section
@@ -274,14 +420,14 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="lg:col-span-5 space-y-6"
+            className="lg:col-span-4 space-y-6"
           >
             <div className="section-card p-6 space-y-6">
 
               {/* Controls */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Project Configuration</h2>
+                  <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Workspace Context</h2>
                   <button
                     onClick={loadSampleHTML}
                     className="text-primary font-bold text-[10px] uppercase tracking-widest hover:underline"
@@ -292,40 +438,66 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Template Identifier</label>
-                    <input
-                      type="text"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value.replace(/[^a-zA-Z0-9_\- ]/g, ''))}
-                      className="input-field !text-sm"
-                      placeholder="e.g. Services Landing"
-                      aria-label="WordPress Template Name or Slug"
-                    />
+                  {!selectedProjectId && (
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Select Project</label>
+                      <select
+                        value={selectedProjectId || ''}
+                        onChange={(e) => setSelectedProjectId(e.target.value)}
+                        className="input-field !text-xs font-bold uppercase tracking-wider h-12"
+                      >
+                        <option value="">-- Choose Project --</option>
+                        {projects.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5 col-span-2">
+                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Template Type</label>
+                      <div className="flex p-1 bg-bg rounded-xl border border-border">
+                        <button
+                          onClick={() => setTemplateType('full-page')}
+                          className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${templateType === 'full-page' ? 'bg-white text-primary shadow-sm border border-border' : 'text-gray-400'}`}
+                        >
+                          Full Page
+                        </button>
+                        <button
+                          onClick={() => setTemplateType('section')}
+                          className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${templateType === 'section' ? 'bg-white text-primary shadow-sm border border-border' : 'text-gray-400'}`}
+                        >
+                          Modular Section
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Page Name</label>
+                      <input
+                        type="text"
+                        value={pageName}
+                        onChange={(e) => setPageName(e.target.value)}
+                        className="input-field !text-sm"
+                        placeholder="e.g. Homepage"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Template Slug</label>
+                      <input
+                        type="text"
+                        value={templateSlug}
+                        onChange={(e) => {
+                          const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                          setTemplateSlug(slug);
+                        }}
+                        className="input-field !text-sm"
+                        placeholder="e.g. home"
+                      />
+                    </div>
                   </div>
 
-                  {/* Accessible Checkbox */}
-                  <div className="flex flex-col gap-2">
-                    <label
-                      className="custom-checkbox group h-14 bg-bg rounded-2xl border border-border px-5 hover:border-primary/20 transition-all flex items-center"
-                      htmlFor="header-toggle"
-                    >
-                      <input
-                        id="header-toggle"
-                        type="checkbox"
-                        className="sr-only"
-                        checked={includeHeader}
-                        onChange={() => setIncludeHeader(!includeHeader)}
-                      />
-                      <div className="checkbox-box group-hover:border-primary/60">
-                        <Check className="checkbox-tick" size={14} strokeWidth={4} aria-hidden="true" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-text mb-0.5">Add Template Name</span>
-                        <span className="text-[10px] text-gray-400 font-medium">Include WordPress metadata header</span>
-                      </div>
-                    </label>
-                  </div>
+
                 </div>
               </div>
 

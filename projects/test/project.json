@@ -1,0 +1,17 @@
+{
+  "id": "test",
+  "name": "test",
+  "type": "custom",
+  "plugins": [
+    "acf-pro"
+  ],
+  "createdAt": 1771096134936,
+  "updatedAt": 1771096177227,
+  "pages": [
+    {
+      "id": "custom-section",
+      "name": "Home Page",
+      "template": "template-custom-section.php"
+    }
+  ]
+}

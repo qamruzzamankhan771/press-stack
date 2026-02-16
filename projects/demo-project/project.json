@@ -1,0 +1,27 @@
+{
+  "id": "demo-project",
+  "name": "Demo Project",
+  "type": "custom",
+  "plugins": [
+    "rank-math",
+    "wordfence"
+  ],
+  "createdAt": 1771228107154,
+  "updatedAt": 1771231675790,
+  "pages": [
+    {
+      "id": "home-page",
+      "name": "Home Page",
+      "slug": "home-page",
+      "templateType": "full-page",
+      "template": "page-home-page.php",
+      "assetDependencies": [
+        "icon1.svg",
+        "icon2.svg"
+      ],
+      "createdAt": 1771228205235,
+      "updatedAt": 1771228205235
+    }
+  ],
+  "schemaVersion": 1
+}

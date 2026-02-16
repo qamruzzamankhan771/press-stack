@@ -1,0 +1,24 @@
+{
+  "id": "stripe",
+  "name": "stripe",
+  "type": "custom",
+  "plugins": [],
+  "createdAt": 1771228959861,
+  "updatedAt": 1771228985883,
+  "pages": [
+    {
+      "id": "home-page",
+      "name": "Home Page",
+      "slug": "home-page",
+      "templateType": "full-page",
+      "template": "page-home-page.php",
+      "assetDependencies": [
+        "icon1.svg",
+        "icon2.svg"
+      ],
+      "createdAt": 1771228985883,
+      "updatedAt": 1771228985883
+    }
+  ],
+  "schemaVersion": 1
+}

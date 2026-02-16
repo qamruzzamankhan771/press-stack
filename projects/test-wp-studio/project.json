@@ -1,0 +1,18 @@
+{
+  "id": "test-wp-studio",
+  "name": "Test WP Studio",
+  "type": "custom",
+  "plugins": [
+    "acf-pro",
+    "rank-math"
+  ],
+  "createdAt": 1771095165305,
+  "updatedAt": 1771095606684,
+  "pages": [
+    {
+      "id": "landing",
+      "name": "Main Landing",
+      "template": "template-landing.php"
+    }
+  ]
+}

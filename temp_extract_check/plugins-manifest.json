@@ -1,0 +1,24 @@
+{
+  "required": [
+    {
+      "name": "Rank Math SEO",
+      "slug": "rank-math",
+      "url": "https://wordpress.org/plugins/rank-math"
+    },
+    {
+      "name": "Wordfence Security",
+      "slug": "wordfence",
+      "url": "https://wordpress.org/plugins/wordfence"
+    },
+    {
+      "name": "Advanced Custom Fields PRO",
+      "url": "https://www.advancedcustomfields.com/"
+    }
+  ],
+  "recommended": [
+    {
+      "name": "Classic Editor",
+      "slug": "classic-editor"
+    }
+  ]
+}

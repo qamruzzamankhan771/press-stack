@@ -1,0 +1,41 @@
+{
+  "key": "group_custom_section",
+  "title": "custom-section Fields",
+  "fields": [
+    {
+      "key": "field_container_main",
+      "label": "Container Main",
+      "name": "container_main",
+      "type": "container",
+      "instructions": "Generated field for main tag",
+      "required": 0,
+      "conditional_logic": 0,
+      "wrapper": {
+        "width": "",
+        "class": "",
+        "id": ""
+      },
+      "default_value": "",
+      "placeholder": "",
+      "prepend": "",
+      "append": ""
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "page_template",
+        "operator": "==",
+        "value": "custom-section.php"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "hide_on_screen": "",
+  "active": true,
+  "description": "Auto-generated ACF fields for custom-section"
+}

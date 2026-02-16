@@ -1,14 +1,17 @@
 import * as cheerio from 'cheerio';
 import { ParsedField } from './fieldGenerator';
 
+export type TemplateKind = 'hierarchy' | 'custom' | 'section';
+
 /**
  * STEP 2: Deterministic PHP Generation
+ * Refactored to use TemplateKind enum for strict branching logic
  */
 export const generatePHP = (
     html: string,
     fields: ParsedField[],
     templateName: string = 'Generated Template',
-    includeHeader: boolean = true
+    templateKind: TemplateKind = 'hierarchy'
 ): string => {
     const $ = cheerio.load(html);
     const phpRegistry = new Map<string, string>();
@@ -83,22 +86,41 @@ export const generatePHP = (
     const $body = $('body').length > 0 ? $('body').empty() : $.root().empty();
     rebuildFromMapping(fields, $body);
 
-    let finalOutput = ($body as any).html() || $.html();
+    let content = ($body as any).html() || $.html();
 
     // Multi-pass placeholder expansion
     let safeguard = 0;
-    while (finalOutput.includes('<ph id="WP_PHP_RAW_') && safeguard < 20) {
+    while (content.includes('<ph id="WP_PHP_RAW_') && safeguard < 20) {
         phpRegistry.forEach((code, id) => {
             const tag = `<ph id="${id}"></ph>`;
-            if (finalOutput.includes(tag)) {
-                finalOutput = finalOutput.split(tag).join(code);
+            if (content.includes(tag)) {
+                content = content.split(tag).join(code);
             }
         });
         safeguard++;
     }
 
-    if (includeHeader) {
-        return `<?php\n/*\nTemplate Name: ${templateName}\n*/\n?>\n\n` + finalOutput;
+    let finalOutput = '';
+
+    // Strict branching logic based on TemplateKind
+    if (templateKind === 'custom') {
+        // Custom templates: Include Template Name header
+        finalOutput += `<?php\n/*\nTemplate Name: ${templateName}\n*/\n?>\n\n`;
+        finalOutput += `<?php get_header(); ?>\n\n`;
+        finalOutput += `<?php if (have_posts()) : while (have_posts()) : the_post(); ?>\n\n`;
+        finalOutput += content;
+        finalOutput += `\n\n<?php endwhile; endif; ?>\n\n`;
+        finalOutput += `<?php get_footer(); ?>`;
+    } else if (templateKind === 'hierarchy') {
+        // Hierarchy templates: No Template Name, rely on file naming
+        finalOutput += `<?php get_header(); ?>\n\n`;
+        finalOutput += `<?php if (have_posts()) : while (have_posts()) : the_post(); ?>\n\n`;
+        finalOutput += content;
+        finalOutput += `\n\n<?php endwhile; endif; ?>\n\n`;
+        finalOutput += `<?php get_footer(); ?>`;
+    } else if (templateKind === 'section') {
+        // Sections: Content only, no loop, no layout functions
+        finalOutput += content;
     }
 
     return finalOutput;
