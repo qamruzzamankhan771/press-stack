@@ -28,7 +28,7 @@ async function validate() {
     // 1. Idempotency Test (x3)
     console.log('\n1. Idempotency Test...');
     for (let i = 1; i <= 3; i++) {
-        const result = compileHTML(html, 'Test Template', true);
+        const result = compileHTML(html, 'Test Template', 'idem-test', 'full-page');
         await savePageToProject({
             projectId: 'wp-evolved', // Using existing project for simplicity in test
             pageName: 'Idempotency Test',
@@ -49,7 +49,7 @@ async function validate() {
 
     // 2. Section Wrapping Check
     console.log('\n2. Section Wrapping Check...');
-    const sectionResult = compileHTML('<div class="box">Content</div>', 'My Section', false);
+    const sectionResult = compileHTML('<div class="box">Content</div>', 'My Section', 'my-section', 'section');
     console.log('   - PHP Header present:', sectionResult.php.includes('Template Name:'));
     console.log('   - Main tag present:', sectionResult.php.includes('<main'));
 

@@ -14,9 +14,11 @@ async function testPhase15() {
         projectId,
         pageName: 'Audit Page',
         templateSlug: 'audit',
+        templateType: 'full-page',
         phpContent: '<?php // Audit Template',
         acfContent: { fields: [] },
-        htmlContent: '<h1>Audit</h1>'
+        htmlContent: '<h1>Audit</h1>',
+        assetDependencies: []
     });
 
     const expectedPhp = path.join(PROJECTS_DIR, projectId, 'theme/templates/template-audit.php');
